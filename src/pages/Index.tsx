@@ -1,18 +1,24 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
+import { DocsSection } from "@/components/DocsSection";
 import { ChangelogSection } from "@/components/ChangelogSection";
 import { ApiDocSection } from "@/components/ApiDocSection";
+import { GuidesSection } from "@/components/GuidesSection";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("home");
 
   const renderSection = () => {
     switch (activeSection) {
+      case "docs":
+        return <DocsSection />;
       case "changelog":
         return <ChangelogSection />;
       case "api":
         return <ApiDocSection />;
+      case "guides":
+        return <GuidesSection />;
       default:
         return <HeroSection />;
     }

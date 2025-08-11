@@ -1,5 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Search, Menu, Github, BookOpen, Clock, Code } from "lucide-react";
+import { useTheme } from "@/components/theme-provider";
+import { Search, Menu, Github, BookOpen, Clock, Code, Moon, Sun, Monitor } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface HeaderProps {
   activeSection: string;
@@ -7,10 +14,14 @@ interface HeaderProps {
 }
 
 export const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
+  const { theme, setTheme } = useTheme();
+
   const navItems = [
     { id: 'home', label: 'Home', icon: BookOpen },
+    { id: 'docs', label: 'Docs', icon: BookOpen },
     { id: 'changelog', label: 'Changelog', icon: Clock },
-    { id: 'api', label: 'API Docs', icon: Code },
+    { id: 'api', label: 'API', icon: Code },
+    { id: 'guides', label: 'Guides', icon: BookOpen },
   ];
 
   return (
@@ -49,6 +60,34 @@ export const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
               ⌘K
             </kbd>
           </div>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                {theme === "light" ? (
+                  <Sun className="w-4 h-4" />
+                ) : theme === "dark" ? (
+                  <Moon className="w-4 h-4" />
+                ) : (
+                  <Monitor className="w-4 h-4" />
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setTheme("light")}>
+                <Sun className="w-4 h-4 mr-2" />
+                Light
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("dark")}>
+                <Moon className="w-4 h-4 mr-2" />
+                Dark
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("system")}>
+                <Monitor className="w-4 h-4 mr-2" />
+                System
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           <Button variant="ghost" size="sm">
             <Github className="w-4 h-4" />
