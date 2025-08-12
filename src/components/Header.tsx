@@ -1,21 +1,28 @@
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/components/theme-provider";
-import { Search, Menu, Github, BookOpen, Clock, Code, Moon, Sun, Monitor } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Moon, Sun, User, LogOut } from "lucide-react";
+import { useTheme } from "next-themes";
+import { ThemeToggle } from "./theme-provider";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BookOpen, Search, Github, Clock, Code, Menu } from "lucide-react";
 
 interface HeaderProps {
   activeSection: string;
   onSectionChange: (section: string) => void;
+  user?: SupabaseUser | null;
+  onSignOut?: () => void;
 }
 
-export const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
-  const { theme, setTheme } = useTheme();
-
+export const Header = ({ activeSection, onSectionChange, user, onSignOut }: HeaderProps) => {
   const navItems = [
     { id: 'home', label: 'Home', icon: BookOpen },
     { id: 'docs', label: 'Docs', icon: BookOpen },
@@ -61,45 +68,48 @@ export const Header = ({ activeSection, onSectionChange }: HeaderProps) => {
             </kbd>
           </div>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
-                {theme === "light" ? (
-                  <Sun className="w-4 h-4" />
-                ) : theme === "dark" ? (
-                  <Moon className="w-4 h-4" />
-                ) : (
-                  <Monitor className="w-4 h-4" />
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setTheme("light")}>
-                <Sun className="w-4 h-4 mr-2" />
-                Light
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")}>
-                <Moon className="w-4 h-4 mr-2" />
-                Dark
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")}>
-                <Monitor className="w-4 h-4 mr-2" />
-                System
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ThemeToggle />
           
-          <Button variant="ghost" size="sm">
-            <Github className="w-4 h-4" />
-          </Button>
-          
-          <Button variant="hero" size="sm" className="hidden sm:flex">
-            Get Started
-          </Button>
-          
-          <Button variant="ghost" size="sm" className="md:hidden">
-            <Menu className="w-4 h-4" />
-          </Button>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src="" alt="" />
+                    <AvatarFallback>
+                      {user.email?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {user.user_metadata?.full_name || "User"}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => window.location.href = "/dashboard"}>
+                  <User className="mr-2 h-4 w-4" />
+                  Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button onClick={() => window.location.href = "/auth"}>
+              Sign In
+            </Button>
+          )}
         </div>
       </div>
     </header>
