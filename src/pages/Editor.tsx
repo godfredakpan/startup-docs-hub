@@ -1615,4 +1615,4 @@ const ProjectEditor = () => {
   );
 };
 
-export default ProjectEditor
+export default ProjectEditor;
