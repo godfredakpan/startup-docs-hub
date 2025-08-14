@@ -17,6 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Progress } from "@/components/ui/progress";
+import { TeamMembersSection } from "@/components/TeamMembersSection";
 
 // Temporary interfaces until types are generated
 interface Profile {
@@ -555,6 +556,19 @@ const Dashboard = () => {
                     </AnimatePresence>
                   </motion.div>
                 )}
+              </motion.div>
+
+              {/* Team Management Section */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                className="mb-8"
+              >
+                <TeamMembersSection 
+                  companyId={profile?.company_id || ""} 
+                  currentUserRole={profile?.role}
+                />
               </motion.div>
             </>
           )}
