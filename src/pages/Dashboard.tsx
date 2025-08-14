@@ -7,7 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, FileText, Building, Users, Settings } from "lucide-react";
+import { Plus, FileText, Building, Users, Settings, ChevronRight, ArrowUpRight, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Progress } from "@/components/ui/progress";
 
 // Temporary interfaces until types are generated
 interface Profile {
@@ -37,11 +46,13 @@ interface DocumentationProject {
   company_id: string;
   title: string;
   slug: string;
+  template_type: string;
   description?: string;
   is_public: boolean;
   cover_image_url?: string;
   created_at: string;
   updated_at: string;
+  last_updated_by?: string;
 }
 
 const Dashboard = () => {
@@ -51,11 +62,12 @@ const Dashboard = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [projects, setProjects] = useState<DocumentationProject[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [teamMembers, setTeamMembers] = useState<number>(0);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
@@ -67,7 +79,6 @@ const Dashboard = () => {
       }
     );
 
-    // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -88,6 +99,8 @@ const Dashboard = () => {
 
   const fetchUserData = async () => {
     try {
+      setStatsLoading(true);
+      
       // Fetch user profile  
       const { data: profileData, error: profileError } = await (supabase as any)
         .from('profiles')
@@ -111,6 +124,15 @@ const Dashboard = () => {
         if (companyError) throw companyError;
         setCompanies(companyData || []);
 
+        // Fetch team members count
+        const { count: membersCount, error: membersError } = await (supabase as any)
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .eq('company_id', profileData.company_id);
+
+        if (membersError) throw membersError;
+        setTeamMembers(membersCount || 0);
+
         // Fetch documentation projects
         const { data: projectsData, error: projectsError } = await (supabase as any)
           .from('documentation_projects')
@@ -129,6 +151,7 @@ const Dashboard = () => {
       });
     } finally {
       setLoading(false);
+      setStatsLoading(false);
     }
   };
 
@@ -150,15 +173,31 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading your dashboard...</p>
+        <div className="text-center space-y-4">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full mx-auto"
+          />
+          <motion.p 
+            initial={{ opacity: 0.5 }}
+            animate={{ opacity: 1 }}
+            transition={{ repeat: Infinity, repeatType: "reverse", duration: 1 }}
+            className="text-muted-foreground"
+          >
+            Preparing your dashboard...
+          </motion.p>
         </div>
       </div>
     );
   }
 
   const hasCompany = profile?.company_id;
+
+  // Calculate completion percentage for demo purposes
+  const completionPercentage = projects.length > 0 
+    ? Math.min(100, (projects.filter(p => p.is_public).length / projects.length) * 100)
+    : 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -172,145 +211,351 @@ const Dashboard = () => {
       <main className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Welcome Section */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">
-              Welcome back, {profile?.full_name || user?.email}!
-            </h1>
-            <p className="text-muted-foreground">
-              Manage your documentation projects and team collaboration.
-            </p>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">
+                  Welcome back, {profile?.full_name || user?.email}!
+                </h1>
+                <p className="text-muted-foreground max-w-2xl">
+                  Here's what's happening with your documentation projects today.
+                </p>
+              </div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="hidden sm:flex items-center gap-1"
+                      onClick={() => fetchUserData()}
+                    >
+                      <span>Refresh</span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className={`${statsLoading ? 'animate-spin' : ''}`}
+                      >
+                        <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <path d="M3 3v5h5" />
+                        <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                        <path d="M16 16h5v5" />
+                      </svg>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Refresh dashboard data</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </motion.div>
 
           {!hasCompany ? (
             /* No Company Setup */
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building className="w-5 h-5" />
-                  Set up your company
-                </CardTitle>
-                <CardDescription>
-                  Create your company profile to start building documentation projects.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={() => navigate("/setup")}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Company
-                </Button>
-              </CardContent>
-            </Card>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="mb-8 border-primary/20 bg-gradient-to-br from-background to-primary/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <Building className="w-5 h-5 text-primary" />
+                    Set up your company
+                  </CardTitle>
+                  <CardDescription>
+                    Create your company profile to start building documentation projects and collaborate with your team.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Button 
+                      onClick={() => navigate("/setup")}
+                      className="group"
+                    >
+                      <Plus className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform" />
+                      Create Company
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => navigate("/join-company")}
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Join Existing Company
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           ) : (
             /* Company Dashboard */
             <>
               {/* Quick Stats */}
-              <div className="grid md:grid-cols-3 gap-6 mb-8">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">Documentation Projects</CardTitle>
-                      <FileText className="w-5 h-5 text-muted-foreground" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold">{projects.length}</div>
-                    <p className="text-sm text-muted-foreground">Active projects</p>
-                  </CardContent>
-                </Card>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ staggerChildren: 0.1 }}
+                className="grid md:grid-cols-4 gap-6 mb-8"
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card className="h-full hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg">Projects</CardTitle>
+                        <FileText className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {statsLoading ? (
+                        <Skeleton className="h-8 w-16 mb-2" />
+                      ) : (
+                        <div className="text-3xl font-bold">{projects.length}</div>
+                      )}
+                      <p className="text-sm text-muted-foreground">Total projects</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
 
-                <Card>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">Team Members</CardTitle>
-                      <Users className="w-5 h-5 text-muted-foreground" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold">1</div>
-                    <p className="text-sm text-muted-foreground">Active members</p>
-                  </CardContent>
-                </Card>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                >
+                  <Card className="h-full hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg">Team</CardTitle>
+                        <Users className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {statsLoading ? (
+                        <Skeleton className="h-8 w-16 mb-2" />
+                      ) : (
+                        <div className="text-3xl font-bold">{teamMembers}</div>
+                      )}
+                      <p className="text-sm text-muted-foreground">Active members</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
 
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.2 }}
+                >
+                  <Card className="h-full hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg">Published</CardTitle>
+                        <ArrowUpRight className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {statsLoading ? (
+                        <Skeleton className="h-8 w-16 mb-2" />
+                      ) : (
+                        <div className="text-3xl font-bold">
+                          {projects.filter(p => p.is_public).length}
+                        </div>
+                      )}
+                      <p className="text-sm text-muted-foreground">Live documentation</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.3 }}
+                >
+                  <Card className="h-full hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg">Completion</CardTitle>
+                        <Settings className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {statsLoading ? (
+                        <Skeleton className="h-8 w-16 mb-2" />
+                      ) : (
+                        <>
+                          <div className="text-3xl font-bold">{Math.round(completionPercentage)}%</div>
+                          <Progress value={completionPercentage} className="h-2 mt-2" />
+                        </>
+                      )}
+                      <p className="text-sm text-muted-foreground mt-2">Published progress</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </motion.div>
+
+              {/* Recent Activity (Placeholder) */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="mb-8"
+              >
                 <Card>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">Published Docs</CardTitle>
-                      <Settings className="w-5 h-5 text-muted-foreground" />
-                    </div>
+                  <CardHeader>
+                    <CardTitle>Recent Activity</CardTitle>
+                    <CardDescription>Latest updates across your projects</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold">
-                      {projects.filter(p => p.is_public).length}
+                    <div className="space-y-4">
+                      {projects.slice(0, 3).map((project) => (
+                        <div key={`activity-${project.id}`} className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                          <div className="bg-primary/10 p-2 rounded-full">
+                            <FileText className="w-4 h-4 text-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-medium">{project.title}</h4>
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(project.updated_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {project.description || "No description provided"}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                      {projects.length === 0 && (
+                        <div className="text-center py-6 text-muted-foreground">
+                          No recent activity yet
+                        </div>
+                      )}
                     </div>
-                    <p className="text-sm text-muted-foreground">Live documentation</p>
                   </CardContent>
                 </Card>
-              </div>
+              </motion.div>
 
               {/* Projects Section */}
-              <div className="mb-8">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="mb-8"
+              >
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold">Documentation Projects</h2>
-                  <Button onClick={() => navigate("/create-project")}>
-                    <Plus className="w-4 h-4 mr-2" />
+                  <h2 className="text-2xl font-bold flex items-center gap-2">
+                    Documentation Projects
+                    <Badge variant="secondary" className="px-2 py-1 text-sm font-normal">
+                      {projects.length} {projects.length === 1 ? 'project' : 'projects'}
+                    </Badge>
+                  </h2>
+                  <Button 
+                    onClick={() => navigate("/create-project")}
+                    className="group"
+                  >
+                    <Plus className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform" />
                     New Project
                   </Button>
                 </div>
 
                 {projects.length === 0 ? (
-                  <Card className="border-dashed border-2 border-primary/20">
-                    <CardContent className="pt-6">
-                      <div className="text-center">
-                        <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">No projects yet</h3>
-                        <p className="text-muted-foreground mb-4">
-                          Create your first documentation project to get started.
-                        </p>
-                        <Button onClick={() => navigate("/create-project")}>
-                          <Plus className="w-4 h-4 mr-2" />
-                          Create First Project
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                  >
+                    <Card className="border-dashed border-2 border-primary/20 bg-gradient-to-br from-background to-primary/5">
+                      <CardContent className="pt-6 pb-8">
+                        <div className="text-center max-w-md mx-auto">
+                          <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <FileText className="w-8 h-8 text-primary" />
+                          </div>
+                          <h3 className="text-xl font-semibold mb-2">No projects yet</h3>
+                          <p className="text-muted-foreground mb-6">
+                            Create your first documentation project to start sharing knowledge with your team and customers.
+                          </p>
+                          <Button 
+                            onClick={() => navigate("/create-project")}
+                            className="group"
+                          >
+                            <Plus className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform" />
+                            Create First Project
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
                 ) : (
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {projects.map((project) => (
-                      <Card key={project.id} className="hover:shadow-soft transition-all duration-300 cursor-pointer">
-                        <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <CardTitle className="text-lg">{project.title}</CardTitle>
-                            <Badge variant={project.is_public ? "default" : "secondary"}>
-                              {project.is_public ? "Public" : "Private"}
-                            </Badge>
-                          </div>
-                          <CardDescription>{project.description}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="flex gap-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => navigate(`/project/${project.id}`)}
-                            >
-                              Edit
-                            </Button>
-                            {project.is_public && (
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => window.open(`/docs/${project.slug}`, '_blank')}
-                              >
-                                View Live
-                              </Button>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                  <motion.div 
+                    layout
+                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+                  >
+                    <AnimatePresence>
+                      {projects.map((project) => (
+                        <motion.div
+                          key={project.id}
+                          layout
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ duration: 0.2 }}
+                          whileHover={{ y: -5 }}
+                        >
+                          <Card 
+                            className="h-full flex flex-col transition-all hover:shadow-md cursor-pointer"
+                            onClick={() => navigate(`/project/${project.id}`)}
+                          >
+                            <CardHeader className="pb-3">
+                              <div className="flex items-start justify-between gap-2">
+                                <CardTitle className="text-lg line-clamp-1">{project.title}</CardTitle>
+                                <Badge 
+                                  variant={project.is_public ? "default" : "secondary"} 
+                                  className="shrink-0"
+                                >
+                                  {project.is_public ? "Public" : "Private"}
+                                </Badge>
+                              </div>
+                              <CardDescription className="line-clamp-2">{project.description}</CardDescription>
+                            </CardHeader>
+                            <CardContent className="mt-auto pt-0">
+                              <div className="flex items-center justify-between">
+                                <div className="text-sm text-muted-foreground">
+                                  Updated {new Date(project.updated_at).toLocaleDateString()}
+                                </div>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  className="text-muted-foreground hover:text-primary"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/project/${project.id}`);
+                                  }}
+                                >
+                                  <ChevronRight className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </motion.div>
                 )}
-              </div>
+              </motion.div>
             </>
           )}
         </div>
