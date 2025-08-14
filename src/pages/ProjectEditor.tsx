@@ -74,6 +74,7 @@ import {
   DeleteIcon
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
+import { TeamMembersSection } from "@/components/TeamMembersSection";
 
 interface DocumentationProject {
   id: string;
@@ -107,7 +108,7 @@ const ProjectEditor = () => {
   const [project, setProject] = useState<DocumentationProject | null>(null);
   const [pages, setPages] = useState<DocumentPage[]>([]);
   const [selectedPage, setSelectedPage] = useState<DocumentPage | null>(null);
-  const [activeTab, setActiveTab] = useState<'content' | 'settings' | 'analytics'>('content');
+  const [activeTab, setActiveTab] = useState<'content' | 'settings' | 'analytics' | 'team'>('content');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showTemplates, setShowTemplates] = useState(true);
@@ -796,6 +797,15 @@ const ProjectEditor = () => {
                 <Activity className="w-3 h-3" />
                 Stats
               </Button>
+              <Button
+                variant={activeTab === 'team' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('team')}
+                className="flex-1"
+              >
+                <Users className="w-3 h-3" />
+                Team
+              </Button>
             </div>
           </div>
 
@@ -1033,7 +1043,24 @@ const ProjectEditor = () => {
                 )}
               </div>
             </div>
-          )}
+          ) : activeTab === 'settings' ? (
+            <div className="p-6">
+              <h2 className="text-2xl font-bold mb-4">Project Settings</h2>
+              <p className="text-muted-foreground">Project settings will be available here.</p>
+            </div>
+          ) : activeTab === 'analytics' ? (
+            <div className="p-6">
+              <h2 className="text-2xl font-bold mb-4">Analytics</h2>
+              <p className="text-muted-foreground">Analytics and statistics will be available here.</p>
+            </div>
+          ) : activeTab === 'team' ? (
+            <div className="p-6">
+              <TeamMembersSection 
+                companyId={project?.company_id || ''} 
+                currentUserRole="admin"
+              />
+            </div>
+          ) : null}
         </div>
 
         {/* Enhanced Main Editor */}
