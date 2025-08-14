@@ -741,327 +741,316 @@ const ProjectEditor = () => {
       <div className="flex h-[calc(100vh-96px)]">
         {/* Enhanced Sidebar */}
         <div className={`bg-muted/30 border-r flex flex-col transition-all duration-200 ${isFullscreen ? 'w-0 overflow-hidden' : 'w-80'}`}>
-          {/* Project Header */}
-          <div className="p-4 border-b">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/dashboard")}
-                className="p-0 h-auto"
-              >
-                <Home className="w-4 h-4" />
-              </Button>
-              <ChevronRight className="w-4 h-4" />
-              <span className="truncate">{project.title}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <h1 className="font-semibold truncate">{project.title}</h1>
-              <Badge variant={project.is_public ? "default" : "secondary"}>
-                {project.is_public ? (
-                  <><Globe className="w-3 h-3 mr-1" />Public</>
-                ) : (
-                  <><Lock className="w-3 h-3 mr-1" />Private</>
-                )}
-              </Badge>
-            </div>
-          </div>
+  {/* Project Header */}
+  <div className="p-4 border-b">
+    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate("/dashboard")}
+        className="p-0 h-auto"
+      >
+        <Home className="w-4 h-4" />
+      </Button>
+      <ChevronRight className="w-4 h-4" />
+      <span className="truncate">{project.title}</span>
+    </div>
+    <div className="flex items-center gap-2">
+      <h1 className="font-semibold truncate">{project.title}</h1>
+      <Badge variant={project.is_public ? "default" : "secondary"}>
+        {project.is_public ? (
+          <><Globe className="w-3 h-3 mr-1" />Public</>
+        ) : (
+          <><Lock className="w-3 h-3 mr-1" />Private</>
+        )}
+      </Badge>
+    </div>
+  </div>
 
-          {/* Enhanced Navigation Tabs */}
-          <div className="p-4">
-            <div className="flex bg-muted rounded-lg p-1">
-              <Button
-                variant={activeTab === 'content' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setActiveTab('content')}
-                className="flex-1"
-              >
-                <FileText className="w-3 h-3" />
-                Content
-              </Button>
-              <Button
-                variant={activeTab === 'settings' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setActiveTab('settings')}
-                className="flex-1"
-              >
-                <Settings className="w-3 h-3" />
-                Settings
-              </Button>
-              <Button
-                variant={activeTab === 'analytics' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setActiveTab('analytics')}
-                className="flex-1"
-              >
-                <Activity className="w-3 h-3" />
-                Stats
-              </Button>
-              <Button
-                variant={activeTab === 'team' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setActiveTab('team')}
-                className="flex-1"
-              >
-                <Users className="w-3 h-3" />
-                Team
-              </Button>
-            </div>
-          </div>
+  {/* Enhanced Navigation Tabs */}
+  <div className="p-4">
+    <div className="flex bg-muted rounded-lg p-1">
+      <Button
+        variant={activeTab === 'content' ? 'default' : 'ghost'}
+        size="sm"
+        onClick={() => setActiveTab('content')}
+        className="flex-1"
+      >
+        <FileText className="w-3 h-3" />
+        Content
+      </Button>
+      <Button
+        variant={activeTab === 'settings' ? 'default' : 'ghost'}
+        size="sm"
+        onClick={() => setActiveTab('settings')}
+        className="flex-1"
+      >
+        <Settings className="w-3 h-3" />
+        Settings
+      </Button>
+      <Button
+        variant={activeTab === 'analytics' ? 'default' : 'ghost'}
+        size="sm"
+        onClick={() => setActiveTab('analytics')}
+        className="flex-1"
+      >
+        <Activity className="w-3 h-3" />
+        Stats
+      </Button>
+      <Button
+        variant={activeTab === 'team' ? 'default' : 'ghost'}
+        size="sm"
+        onClick={() => setActiveTab('team')}
+        className="flex-1"
+      >
+        <Users className="w-3 h-3" />
+        Team
+      </Button>
+    </div>
+  </div>
 
-          {/* Content based on active tab */}
-          {activeTab === 'content' ? (
-            <div className="flex-1 overflow-hidden">
-              {/* Enhanced search and controls */}
-              <div className="p-4 space-y-3">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <Input
-                    placeholder="Search pages..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium">Pages ({filteredPages.length})</h3>
-                  <div className="flex gap-1">
-                    <Button size="sm" onClick={handleCreatePage} title="Add new page">
-                      <Plus className="w-4 h-4" />
-                    </Button>
-                    <Button size="sm" variant="outline" title="Filter pages">
-                      <Filter className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Enhanced Pages List */}
-              <div className="flex-1 overflow-auto px-4 pb-4">
-                <div className="space-y-1">
-                  {filteredPages.map((page) => (
-                    <Card
-                      key={page.id}
-                      className={`cursor-pointer transition-all hover:shadow-sm ${
-                        selectedPage?.id === page.id ? 'border-primary bg-primary/5' : ''
-                      }`}
-                      onClick={() => {
-                        setSelectedPage(page);
-                        setPageContent({
-                          title: page.title,
-                          slug: page.slug,
-                          content: page.content || "",
-                          is_published: page.is_published
-                        });
-                      }}
-                    >
-                      <CardHeader className="p-3">
-                        <div className="flex items-start justify-between">
-                            <div className="flex-1 min-w-0">
-                            <CardTitle className="text-sm font-medium truncate flex items-center gap-2">
-                                <FileText className="w-4 h-4 flex-shrink-0" />
-                                {page.title}
-                            </CardTitle>
-                            <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                                <span>{page.content?.split(" ").length || 0} words</span>
-                                <span>•</span>
-                                <span>
-                                {Math.ceil((page.content?.split(" ").length || 0) / 200)} min read
-                                </span>
-                            </div>
-                            </div>
-
-                            <div className="flex items-center gap-1 ml-2">
-                            {page.is_published && (
-                                <div
-                                className="w-2 h-2 bg-green-500 rounded-full"
-                                title="Published"
-                                ></div>
-                            )}
-
-                             <Button variant="ghost" size="sm" className="p-0 w-6 h-6">
-                                {/* Icon here */}
-                                {/* <Settings className="w-4 h-4" /> */}
-                            </Button>
-                            </div>
-                        </div>
-                        </CardHeader>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : activeTab === 'settings' ? (
-            <div className="flex-1 p-4 space-y-6 overflow-auto">
-              {/* Project Settings */}
-              <div className="space-y-4">
-                <h3 className="font-medium">Project Information</h3>
-                
-                <div>
-                  <Label htmlFor="project-title">Project Title</Label>
-                  <Input
-                    id="project-title"
-                    value={projectSettings.title}
-                    onChange={(e) => setProjectSettings(prev => ({ ...prev, title: e.target.value }))}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="project-slug">Slug</Label>
-                  <Input
-                    id="project-slug"
-                    value={projectSettings.slug}
-                    onChange={(e) => setProjectSettings(prev => ({ ...prev, slug: e.target.value }))}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="project-description">Description</Label>
-                  <Textarea
-                    id="project-description"
-                    value={projectSettings.description}
-                    onChange={(e) => setProjectSettings(prev => ({ ...prev, description: e.target.value }))}
-                    rows={3}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Visibility Settings */}
-              <div className="space-y-4">
-                <h3 className="font-medium">Visibility & Access</h3>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Public Access</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Allow anyone to view this documentation
-                    </p>
-                  </div>
-                  <Switch
-                    checked={projectSettings.is_public}
-                    onCheckedChange={(checked) => setProjectSettings(prev => ({ ...prev, is_public: checked }))}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Auto-save</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Automatically save changes every 10 seconds
-                    </p>
-                  </div>
-                  <Switch
-                    checked={autoSaveEnabled}
-                    onCheckedChange={setAutoSaveEnabled}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Export/Import */}
-              <div className="space-y-4">
-                <h3 className="font-medium">Export & Import</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button variant="outline" size="sm">
-                    <Download className="w-4 h-4 mr-2" />
-                    Export
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Import
-                  </Button>
-                </div>
-              </div>
-
-              <Button onClick={handleSaveProject} disabled={saving} className="w-full">
-                {saving ? "Saving..." : "Save Settings"}
-              </Button>
-            </div>
-          ) : (
-            // Analytics Tab
-            <div className="flex-1 p-4 space-y-6 overflow-auto">
-              <div className="space-y-4">
-                <h3 className="font-medium">Analytics Overview</h3>
-                
-                <div className="grid grid-cols-1 gap-4">
-                  <Card>
-                    <CardHeader className="p-3">
-                      <CardTitle className="text-sm">Total Pages</CardTitle>
-                      <CardDescription className="text-2xl font-bold text-primary">
-                        {pages.length}
-                      </CardDescription>
-                    </CardHeader>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="p-3">
-                      <CardTitle className="text-sm">Published</CardTitle>
-                      <CardDescription className="text-2xl font-bold text-green-600">
-                        {pages.filter(p => p.is_published).length}
-                      </CardDescription>
-                    </CardHeader>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="p-3">
-                      <CardTitle className="text-sm">Total Words</CardTitle>
-                      <CardDescription className="text-2xl font-bold text-primary">
-                        {pages.reduce((acc, p) => acc + (p.content?.split(' ').length || 0), 0).toLocaleString()}
-                      </CardDescription>
-                    </CardHeader>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="p-3">
-                      <CardTitle className="text-sm">Last Updated</CardTitle>
-                      <CardDescription className="text-xs text-muted-foreground">
-                        {new Date(project.updated_at).toLocaleDateString()}
-                      </CardDescription>
-                    </CardHeader>
-                  </Card>
-                </div>
-
-                {pages.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Page Statistics</h4>
-                    {pages.slice(0, 5).map((page, index) => (
-                      <div key={page.id} className="flex items-center justify-between p-2 rounded border">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-3 h-3 text-muted-foreground" />
-                          <span className="text-sm truncate">{page.title}</span>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {page.content?.split(' ').length || 0} words
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : activeTab === 'settings' ? (
-            <div className="p-6">
-              <h2 className="text-2xl font-bold mb-4">Project Settings</h2>
-              <p className="text-muted-foreground">Project settings will be available here.</p>
-            </div>
-          ) : activeTab === 'analytics' ? (
-            <div className="p-6">
-              <h2 className="text-2xl font-bold mb-4">Analytics</h2>
-              <p className="text-muted-foreground">Analytics and statistics will be available here.</p>
-            </div>
-          ) : activeTab === 'team' ? (
-            <div className="p-6">
-              <TeamMembersSection 
-                companyId={project?.company_id || ''} 
-                currentUserRole="admin"
-              />
-            </div>
-          ) : null}
+  {/* Content based on active tab */}
+  {activeTab === 'content' ? (
+    <div className="flex-1 overflow-hidden">
+      {/* Enhanced search and controls */}
+      <div className="p-4 space-y-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          <Input
+            placeholder="Search pages..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
         </div>
+
+        <div className="flex items-center justify-between">
+          <h3 className="font-medium">Pages ({filteredPages.length})</h3>
+          <div className="flex gap-1">
+            <Button size="sm" onClick={handleCreatePage} title="Add new page">
+              <Plus className="w-4 h-4" />
+            </Button>
+            <Button size="sm" variant="outline" title="Filter pages">
+              <Filter className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+      
+      {/* Enhanced Pages List */}
+      <div className="flex-1 overflow-auto px-4 pb-4">
+        <div className="space-y-1">
+          {filteredPages.map((page) => (
+            <Card
+              key={page.id}
+              className={`cursor-pointer transition-all hover:shadow-sm ${
+                selectedPage?.id === page.id ? 'border-primary bg-primary/5' : ''
+              }`}
+              onClick={() => {
+                setSelectedPage(page);
+                setPageContent({
+                  title: page.title,
+                  slug: page.slug,
+                  content: page.content || "",
+                  is_published: page.is_published
+                });
+              }}
+            >
+              <CardHeader className="p-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-sm font-medium truncate flex items-center gap-2">
+                      <FileText className="w-4 h-4 flex-shrink-0" />
+                      {page.title}
+                    </CardTitle>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                      <span>{page.content?.split(" ").length || 0} words</span>
+                      <span>•</span>
+                      <span>
+                        {Math.ceil((page.content?.split(" ").length || 0) / 200)} min read
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1 ml-2">
+                    {page.is_published && (
+                      <div
+                        className="w-2 h-2 bg-green-500 rounded-full"
+                        title="Published"
+                      ></div>
+                    )}
+
+                    <Button variant="ghost" size="sm" className="p-0 w-6 h-6">
+                      {/* Icon here */}
+                      {/* <Settings className="w-4 h-4" /> */}
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  ) : activeTab === 'settings' ? (
+    <div className="flex-1 p-4 space-y-6 overflow-auto">
+      {/* Project Settings */}
+      <div className="space-y-4">
+        <h3 className="font-medium">Project Information</h3>
+        
+        <div>
+          <Label htmlFor="project-title">Project Title</Label>
+          <Input
+            id="project-title"
+            value={projectSettings.title}
+            onChange={(e) => setProjectSettings(prev => ({ ...prev, title: e.target.value }))}
+          />
+        </div>
+        
+        <div>
+          <Label htmlFor="project-slug">Slug</Label>
+          <Input
+            id="project-slug"
+            value={projectSettings.slug}
+            onChange={(e) => setProjectSettings(prev => ({ ...prev, slug: e.target.value }))}
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="project-description">Description</Label>
+          <Textarea
+            id="project-description"
+            value={projectSettings.description}
+            onChange={(e) => setProjectSettings(prev => ({ ...prev, description: e.target.value }))}
+            rows={3}
+          />
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Visibility Settings */}
+      <div className="space-y-4">
+        <h3 className="font-medium">Visibility & Access</h3>
+        
+        <div className="flex items-center justify-between">
+          <div>
+            <Label>Public Access</Label>
+            <p className="text-sm text-muted-foreground">
+              Allow anyone to view this documentation
+            </p>
+          </div>
+          <Switch
+            checked={projectSettings.is_public}
+            onCheckedChange={(checked) => setProjectSettings(prev => ({ ...prev, is_public: checked }))}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <Label>Auto-save</Label>
+            <p className="text-sm text-muted-foreground">
+              Automatically save changes every 10 seconds
+            </p>
+          </div>
+          <Switch
+            checked={autoSaveEnabled}
+            onCheckedChange={setAutoSaveEnabled}
+          />
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Export/Import */}
+      <div className="space-y-4">
+        <h3 className="font-medium">Export & Import</h3>
+        <div className="grid grid-cols-2 gap-2">
+          <Button variant="outline" size="sm">
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </Button>
+          <Button variant="outline" size="sm">
+            <Upload className="w-4 h-4 mr-2" />
+            Import
+          </Button>
+        </div>
+      </div>
+
+      <Button onClick={handleSaveProject} disabled={saving} className="w-full">
+        {saving ? "Saving..." : "Save Settings"}
+      </Button>
+    </div>
+  ) : activeTab === 'analytics' ? (
+    <div className="flex-1 p-4 space-y-6 overflow-auto">
+      <div className="space-y-4">
+        <h3 className="font-medium">Analytics Overview</h3>
+        
+        <div className="grid grid-cols-1 gap-4">
+          <Card>
+            <CardHeader className="p-3">
+              <CardTitle className="text-sm">Total Pages</CardTitle>
+              <CardDescription className="text-2xl font-bold text-primary">
+                {pages.length}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+          
+          <Card>
+            <CardHeader className="p-3">
+              <CardTitle className="text-sm">Published</CardTitle>
+              <CardDescription className="text-2xl font-bold text-green-600">
+                {pages.filter(p => p.is_published).length}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+          
+          <Card>
+            <CardHeader className="p-3">
+              <CardTitle className="text-sm">Total Words</CardTitle>
+              <CardDescription className="text-2xl font-bold text-primary">
+                {pages.reduce((acc, p) => acc + (p.content?.split(' ').length || 0), 0).toLocaleString()}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+          
+          <Card>
+            <CardHeader className="p-3">
+              <CardTitle className="text-sm">Last Updated</CardTitle>
+              <CardDescription className="text-xs text-muted-foreground">
+                {new Date(project.updated_at).toLocaleDateString()}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+
+        {pages.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">Page Statistics</h4>
+            {pages.slice(0, 5).map((page, index) => (
+              <div key={page.id} className="flex items-center justify-between p-2 rounded border">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-3 h-3 text-muted-foreground" />
+                  <span className="text-sm truncate">{page.title}</span>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {page.content?.split(' ').length || 0} words
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  ) : activeTab === 'team' ? (
+    <div className="p-6">
+      <TeamMembersSection 
+        companyId={project?.company_id || ''} 
+        currentUserRole="admin"
+      />
+    </div>
+  ) : null}
+</div>
 
         {/* Enhanced Main Editor */}
         <div className="flex-1 flex flex-col">
