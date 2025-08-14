@@ -12,10 +12,10 @@ const Index = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600">
-              <BookOpen className="h-5 w-5 text-white" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+              <img src="/logo.png" alt="Logo" className="w-8 h-8" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">DocHub</span>
+            <span className="text-2xl font-bold text-white bg-clip-text text-transparent">DocHub</span>
           </div>
           
           <nav className="hidden md:flex items-center space-x-8">
@@ -27,7 +27,7 @@ const Index = () => {
           
           <div className="hidden md:flex items-center gap-4">
             <button onClick={() => window.location.href = "/auth"} className="text-gray-300 hover:text-white transition-colors font-medium">Sign In</button>
-            <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200 hover:scale-105">
+            <button className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200 hover:scale-105">
               Start Free Trial
             </button>
           </div>
@@ -48,7 +48,7 @@ const Index = () => {
               <a href="#testimonials" className="text-gray-300 hover:text-white transition-colors font-medium">Testimonials</a>
               <a href="#docs" className="text-gray-300 hover:text-white transition-colors font-medium">Docs</a>
               <div className="pt-4 border-t border-gray-800">
-                <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold">
+                <button className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold">
                   Start Free Trial
                 </button>
               </div>
@@ -83,17 +83,17 @@ const Index = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-200 hover:scale-105 flex items-center gap-2">
+            <button className="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-200 hover:scale-105 flex items-center gap-2">
               Start Free Trial
               <ArrowRight size={20} />
             </button>
-            <button className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors font-medium border border-gray-700 px-6 py-3 rounded-xl hover:border-gray-600">
+            {/* <button className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors font-medium border border-gray-700 px-6 py-3 rounded-xl hover:border-gray-600">
               <Play size={20} />
               Watch Demo
-            </button>
+            </button> */}
           </div>
           
-          <div className="flex items-center justify-center gap-8 text-sm text-gray-400">
+          {/* <div className="flex items-center justify-center gap-8 text-sm text-gray-400">
             <div className="flex items-center gap-2">
               <Check size={16} className="text-green-400" />
               <span>14-day free trial</span>
@@ -106,7 +106,7 @@ const Index = () => {
               <Check size={16} className="text-green-400" />
               <span>Cancel anytime</span>
             </div>
-          </div>
+          </div> */}
         </div>
         
         <div className="mt-16">
@@ -137,7 +137,7 @@ const Index = () => {
   const SocialProofSection = () => (
     <section className="py-12 bg-black border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-center text-gray-400 mb-8 font-medium">Trusted by 10,000+ companies worldwide</p>
+        <p className="text-center text-gray-400 mb-8 font-medium">Trusted by 100+ companies worldwide</p>
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 items-center opacity-40">
           {['TechCorp', 'InnovateLabs', 'DevTools', 'CloudSync', 'DataFlow', 'NextGen'].map((company, index) => (
             <div key={index} className="text-center font-bold text-xl text-gray-500">
@@ -340,7 +340,7 @@ const Index = () => {
           ].map((plan, index) => (
             <div key={index} className={`bg-gray-800 p-8 rounded-2xl border-2 transition-all duration-200 hover:-translate-y-1 ${plan.popular ? 'border-blue-500 shadow-xl shadow-blue-500/20' : 'border-gray-700 hover:border-gray-600'}`}>
               {plan.popular && (
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-1 rounded-full text-sm font-bold inline-block mb-4">
+                <div className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-bold inline-block mb-4">
                   Most Popular
                 </div>
               )}
@@ -366,7 +366,7 @@ const Index = () => {
                 ))}
               </ul>
               
-              <button className={`w-full py-4 rounded-xl font-semibold transition-all duration-200 ${plan.popular ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg hover:shadow-blue-500/25 hover:scale-105' : 'bg-gray-700 text-white hover:bg-gray-600'}`}>
+              <button className={`w-full py-4 rounded-xl font-semibold transition-all duration-200 ${plan.popular ? 'bg-blue-600 text-white hover:shadow-lg hover:shadow-blue-500/25 hover:scale-105' : 'bg-gray-700 text-white hover:bg-gray-600'}`}>
                 {plan.cta}
               </button>
             </div>
@@ -382,7 +382,7 @@ const Index = () => {
 
   // CTA Section
   const CTASection = () => (
-    <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+    <section className="py-20 bg-blue-900">
       <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
         <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
           Ready to transform your documentation?
@@ -411,8 +411,8 @@ const Index = () => {
         <div className="grid md:grid-cols-5 gap-8 mb-12">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600">
-                <BookOpen className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+                <img src="/logo.png" alt="Logo" className="w-8 h-8" />
               </div>
               <span className="text-2xl font-bold">DocHub</span>
             </div>
