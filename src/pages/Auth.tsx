@@ -95,12 +95,12 @@ const Auth = () => {
       
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
+          {/* <div className="flex items-center justify-center gap-2 mb-4">
             <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">D</span>
             </div>
             <span className="text-2xl font-bold">DocHub</span>
-          </div>
+          </div> */}
           <CardTitle>Welcome to DocHub</CardTitle>
           <CardDescription>
             Create beautiful documentation for your startup

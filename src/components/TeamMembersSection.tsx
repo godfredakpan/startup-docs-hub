@@ -163,27 +163,33 @@ export const TeamMembersSection: React.FC<TeamMembersSectionProps> = ({
     <>
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Team Members
-                <Badge variant="secondary" className="ml-2">
-                  {members.length} {members.length === 1 ? 'member' : 'members'}
-                </Badge>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col gap-1">
+              <CardTitle className="flex flex-col xs:flex-row xs:items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Members
+                  <Badge variant="secondary" className="ml-0 sm:ml-2">
+                    {members.length}
+                  </Badge>
+                </div>
               </CardTitle>
               <CardDescription>Manage your team members and invitations</CardDescription>
-            </div>
-            
-            {canManageTeam && (
-              <Button onClick={() => setInviteDialogOpen(true)} size="sm">
+              {canManageTeam && (
+              <Button 
+                onClick={() => setInviteDialogOpen(true)} 
+                size="sm"
+                className="w-full sm:w-auto"
+              >
                 <UserPlus className="w-4 h-4 mr-2" />
                 Invite Member
               </Button>
             )}
+            </div>
+            
+            
           </div>
         </CardHeader>
-        
         <CardContent>
           <div className="space-y-4">
             {/* Team Members */}
@@ -192,7 +198,7 @@ export const TeamMembersSection: React.FC<TeamMembersSectionProps> = ({
                 <div className="flex items-center gap-3">
                   <Avatar className="w-10 h-10">
                     <AvatarImage src={member.avatar_url} />
-                    <AvatarFallback>
+                    <AvatarFallback style={{fontSize: '0.8rem'}}>
                       {member.full_name ? member.full_name.charAt(0).toUpperCase() : 'U'}
                     </AvatarFallback>
                   </Avatar>
@@ -237,42 +243,52 @@ export const TeamMembersSection: React.FC<TeamMembersSectionProps> = ({
                 </h4>
                 
                 {invitations.map((invitation) => (
-                  <div key={invitation.id} className="flex items-center justify-between p-3 rounded-lg border border-dashed">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                  <div 
+                    key={invitation.id} 
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-lg border border-dashed gap-3 sm:gap-0"
+                  >
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                      <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
                         <Mail className="w-4 h-4 text-muted-foreground" />
                       </div>
-                      <div>
-                        <p className="font-medium">{invitation.email}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Invited {new Date(invitation.created_at).toLocaleDateString()} • 
-                          Expires {new Date(invitation.expires_at).toLocaleDateString()}
+                      <div className="min-w-0">
+                        <p className="text-sm truncate">{invitation.email}</p>
+                        <p className="text-sm text-muted-foreground flex flex-col xs:flex-row xs:gap-2">
+                          <span>Invited {new Date(invitation.created_at).toLocaleDateString()}</span>
+                          <span className="hidden xs:inline">•</span>
+                          <span>Expires {new Date(invitation.expires_at).toLocaleDateString()}</span>
                         </p>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center gap-2">
+
+                  <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-normal">
+                  {!window.location.pathname.startsWith('/project/') && (
+                    <>
                       <Badge variant="outline" className="flex items-center gap-1">
                         {getRoleIcon(invitation.role)}
-                        {invitation.role}
+                        <span className="hidden sm:inline">{invitation.role}</span>
+                        <span className="sm:hidden">{invitation.role.charAt(0).toUpperCase()}</span>
                       </Badge>
                       
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" className="ml-auto sm:ml-0">
                             <MoreVertical className="w-4 h-4" />
+                            <span className="sr-only">Actions</span>
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem 
-                            className="text-destructive"
+                            className="text-destructive focus:text-destructive"
                             onClick={() => handleCancelInvitation(invitation.id)}
                           >
                             Cancel Invitation
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </div>
+                    </>
+                  )}
+                </div>
                   </div>
                 ))}
               </div>

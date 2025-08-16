@@ -769,45 +769,53 @@ const ProjectEditor = () => {
 
   {/* Enhanced Navigation Tabs */}
   <div className="p-4">
-    <div className="flex bg-muted rounded-lg p-1">
-      <Button
-        variant={activeTab === 'content' ? 'default' : 'ghost'}
-        size="sm"
-        onClick={() => setActiveTab('content')}
-        className="flex-1"
-      >
-        <FileText className="w-3 h-3" />
-        Content
-      </Button>
-      <Button
-        variant={activeTab === 'settings' ? 'default' : 'ghost'}
-        size="sm"
-        onClick={() => setActiveTab('settings')}
-        className="flex-1"
-      >
-        <Settings className="w-3 h-3" />
-        Settings
-      </Button>
-      <Button
-        variant={activeTab === 'analytics' ? 'default' : 'ghost'}
-        size="sm"
-        onClick={() => setActiveTab('analytics')}
-        className="flex-1"
-      >
-        <Activity className="w-3 h-3" />
-        Stats
-      </Button>
-      <Button
-        variant={activeTab === 'team' ? 'default' : 'ghost'}
-        size="sm"
-        onClick={() => setActiveTab('team')}
-        className="flex-1"
-      >
-        <Users className="w-3 h-3" />
-        Team
-      </Button>
+  <div className="relative">
+    {/* Scrollable tabs container */}
+    <div className="overflow-x-auto pb-2 -mx-4 px-4">
+      <div className="flex bg-muted rounded-lg p-1 w-max min-w-full">
+        <Button
+          variant={activeTab === 'content' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setActiveTab('content')}
+          className="flex-shrink-0"
+        >
+          <FileText className="w-3 h-3" />
+          <span className="ml-2">Content</span>
+        </Button>
+        <Button
+          variant={activeTab === 'settings' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setActiveTab('settings')}
+          className="flex-shrink-0"
+        >
+          <Settings className="w-3 h-3" />
+          <span className="ml-2">Settings</span>
+        </Button>
+        <Button
+          variant={activeTab === 'analytics' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setActiveTab('analytics')}
+          className="flex-shrink-0"
+        >
+          <Activity className="w-3 h-3" />
+          <span className="ml-2">Stats</span>
+        </Button>
+        <Button
+          variant={activeTab === 'team' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setActiveTab('team')}
+          className="flex-shrink-0"
+        >
+          <Users className="w-3 h-3" />
+          <span className="ml-2">Team</span>
+        </Button>
+      </div>
     </div>
+    
+    {/* Gradient fade effect for scroll indication */}
+    <div className="absolute right-0 top-0 bottom-0 w-8 pointer-events-none bg-gradient-to-l from-muted to-transparent"></div>
   </div>
+</div>
 
   {/* Content based on active tab */}
   {activeTab === 'content' ? (

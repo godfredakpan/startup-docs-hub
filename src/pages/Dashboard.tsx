@@ -305,22 +305,19 @@ const Dashboard = () => {
             /* Company Dashboard */
             <>
               {/* Quick Stats */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ staggerChildren: 0.1 }}
                 className="grid md:grid-cols-4 gap-6 mb-8"
               >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
+                {/* Projects */}
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                   <Card className="h-full hover:shadow-md transition-shadow">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-lg">Projects</CardTitle>
-                        <FileText className="w-5 h-5 text-muted-foreground" />
+                        <FileText className="w-5 h-5 text-blue-900 dark:text-blue-300" />
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -334,16 +331,13 @@ const Dashboard = () => {
                   </Card>
                 </motion.div>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.1 }}
-                >
+                {/* Team */}
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}>
                   <Card className="h-full hover:shadow-md transition-shadow">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-lg">Team</CardTitle>
-                        <Users className="w-5 h-5 text-muted-foreground" />
+                        <Users className="w-5 h-5 text-emerald-800 dark:text-emerald-200" />
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -357,16 +351,13 @@ const Dashboard = () => {
                   </Card>
                 </motion.div>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.2 }}
-                >
+                {/* Published */}
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
                   <Card className="h-full hover:shadow-md transition-shadow">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-lg">Published</CardTitle>
-                        <ArrowUpRight className="w-5 h-5 text-muted-foreground" />
+                        <ArrowUpRight className="w-5 h-5 text-green-600 dark:text-green-600" />
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -374,7 +365,7 @@ const Dashboard = () => {
                         <Skeleton className="h-8 w-16 mb-2" />
                       ) : (
                         <div className="text-3xl font-bold">
-                          {projects.filter(p => p.is_public).length}
+                          {projects.filter((p) => p.is_public).length}
                         </div>
                       )}
                       <p className="text-sm text-muted-foreground">Live documentation</p>
@@ -382,16 +373,13 @@ const Dashboard = () => {
                   </Card>
                 </motion.div>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.3 }}
-                >
+                {/* Completion */}
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.3 }}>
                   <Card className="h-full hover:shadow-md transition-shadow">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-lg">Completion</CardTitle>
-                        <Settings className="w-5 h-5 text-muted-foreground" />
+                        <Settings className="w-5 h-5 text-orange-600 dark:text-orange-600" />
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -400,14 +388,23 @@ const Dashboard = () => {
                       ) : (
                         <>
                           <div className="text-3xl font-bold">{Math.round(completionPercentage)}%</div>
-                          <Progress value={completionPercentage} className="h-2 mt-2" />
-                        </>
+                        <Progress
+                          value={completionPercentage}
+                          className={`h-2 mt-2 
+                            ${completionPercentage < 50 
+                              ? "bg-red-200 [&>div]:bg-red-500" 
+                              : completionPercentage < 80 
+                                ? "bg-yellow-200 [&>div]:bg-yellow-500" 
+                                : "bg-green-200 [&>div]:bg-green-500"
+                            }`}
+                        />                        </>
                       )}
                       <p className="text-sm text-muted-foreground mt-2">Published progress</p>
                     </CardContent>
                   </Card>
                 </motion.div>
               </motion.div>
+
 
               {/* Recent Activity (Placeholder) */}
               <motion.div
@@ -426,7 +423,7 @@ const Dashboard = () => {
                       {projects.slice(0, 3).map((project) => (
                         <div key={`activity-${project.id}`} className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
                           <div className="bg-primary/10 p-2 rounded-full">
-                            <FileText className="w-4 h-4 text-primary" />
+                            <FileText className="w-4 h-4 text-blue-300 dark:text-blue-400" />
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center justify-between">
@@ -523,9 +520,13 @@ const Dashboard = () => {
                             <CardHeader className="pb-3">
                               <div className="flex items-start justify-between gap-2">
                                 <CardTitle className="text-lg line-clamp-1">{project.title}</CardTitle>
-                                <Badge 
-                                  variant={project.is_public ? "default" : "secondary"} 
-                                  className="shrink-0"
+                                <Badge
+                                  variant={project.is_public ? "default" : "secondary"}
+                                  className={`shrink-0 
+                                    ${project.is_public 
+                                      ? "text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900" 
+                                      : "text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700"
+                                    }`}
                                 >
                                   {project.is_public ? "Public" : "Private"}
                                 </Badge>
